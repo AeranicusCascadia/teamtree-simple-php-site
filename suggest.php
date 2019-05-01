@@ -1,5 +1,11 @@
 <?php
 
+// reference to 3rd party library
+use PHPMailer\PHPMailer\PHPMailer;
+require 'vendor/phpmailer/src/PHPMailer.php';
+require 'vendor/phpmailer/src/Exception.php';
+
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 	$name = trim(filter_input(INPUT_POST,"name",FILTER_SANITIZE_STRING));
@@ -16,16 +22,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		echo "Bad form input.";
 		exit;
 		}	
-
-	echo "<pre>";
+		
+		
+	if (!PHPMailer::validateAddress($email)) { // Does static class method return false (invalid email address)?
+		echo "Invalid Email Address";
+		exit;
+		}
+		
 	$email_body = "";
 	$email_body .= "Name: " . $name .  "<br>";
 	$email_body .= "Email: " . $email . "<br>";
 	$email_body .= "details: " . $details . "<br>";
-	echo $email_body;
-	echo "</pre>";
 
-	// To Do: send email ... not yet implemented, but this is where it (or other processing of form data) should happen.
+	$mail = new PHPMailer;
+	
+	//It's important not to use the submitter's address as the from address as it's forgery,
+	//which will cause your messages to fail SPF checks.
+	//Use an address in your own domain as the from address, put the submitter's address in a reply-to
+	$mail->setFrom('aaron.uusitalo@gmail.com',$name);
+	$mail->addReplyTo($email, $name);
+	$mail->addAddress('aaron.uusitalo@gmail.com','Aaron U');
+	$mail->Subject = 'Library suggestion form from ' . $name;
+	$mail->Body = $email_body;
+	if (!$mail->send()) {
+		echo "Mailer Error: " . $mail->ErrorInfo;
+	}
+	
 	header("location:suggest.php?status=thanks"); // redirects to this page, but includes variable ('staus') that can be used in conditional.
 	
 }
