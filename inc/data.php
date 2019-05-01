@@ -116,12 +116,13 @@ $catalog[203] = [
         "Peter Jackson"
     ],
     "stars" => [
-        "Ron Livingston",
-        "Jennifer Aniston",
-        "David Herman",
-        "Ajay Naidu",
-        "Diedrich Bader",
-        "Stephen Root"
+        "Kate Blanchette",
+        "Ian McKellen",
+        "Elijah Wood",
+        "Liv Tyler",
+        "Sean Bean",
+        "Hugo Weaving",
+        "Orlando Bloom"
     ]
 ];
 $catalog[204] = [
