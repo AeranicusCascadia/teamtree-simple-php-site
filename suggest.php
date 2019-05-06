@@ -21,19 +21,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	$year = trim(filter_input(INPUT_POST,"year",FILTER_SANITIZE_NUMBER_INT));
 	$details = trim(filter_input(INPUT_POST,"details",FILTER_SANITIZE_SPECIAL_CHARS));
 
-
+// form field validation
+// Cascading conditionals check if error message is set, providing error message prioritization
 	// check that required fields have values
 	if ($name == "" || $email == "" || $category == "" || $title == "") {
 		$error_message =  "Please fill in the required fields: Name, Email, Category, and Title.";
 		}
 		
 	// Spam honeypot check. Address field is hidden, so if it's not blank a bot is scraping the html and filling it out
-	if ($_POST["address"] != "") {
+	if ( !isset($error_message) && $_POST["address"] != "" ) {
 		$error_message = "Bad form input.";
 		}	
 		
 		
-	if (!PHPMailer::validateAddress($email)) { // Does static class method return false (invalid email address)?
+	if (!isset($error_message) && !PHPMailer::validateAddress($email)) { // Does static class method return false (invalid email address)?
 		$error_message = "Invalid Email Address";
 		}
 		
@@ -106,17 +107,18 @@ include("inc/header.php");
 	
 	<div class="wrapper">
 
-		<h1>Suggest a Media Item</h1>
+		<h1>Suggest a Media Item</h1>	
 		
-		
-		
-	<?php if ( isset($_GET["status"]) && $_GET["status"] == "thanks" ) {
+	<?php 
+	if ( isset($_GET["status"]) && $_GET["status"] == "thanks" ) {
 			echo "<p>Thanks for your email. I&apos;ll check out your suggestion soon.</p>";
-			} else { ?>
-			
-		
-		
-		<p>If you think there is something I&apos;m missing, let me know. Complete the form to send me an email.</p>
+			} else { 
+				if (isset($error_message)) {
+					echo '<p class="message">' . $error_message . '</p>';
+				} else {
+					echo '<p>If you think there is something I&apos;m missing, let me know. Complete the form to send me an email.</p>';
+					}
+	?>	
 		
 		<form method="post" action="suggest.php">
 			
